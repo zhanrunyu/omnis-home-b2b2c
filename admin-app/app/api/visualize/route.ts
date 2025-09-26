@@ -31,10 +31,9 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ composite_url });
-  } catch (err: any) {
-    return NextResponse.json(
-      { error: err?.message ?? "Bad Request" },
-      { status: 400 }
-    );
-  }
+    } catch (err) {
+    const message = err instanceof Error ? err.message : "Bad Request";
+    return NextResponse.json({ error: message }, { status: 400 });
+    }
+
 }
