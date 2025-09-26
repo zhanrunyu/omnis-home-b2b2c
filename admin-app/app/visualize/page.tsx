@@ -31,8 +31,12 @@ export default function VisualizePage() {
       if (!res.ok) throw new Error(data.error || "Request failed");
 
       setResult({ url: data.composite_url, jobId: data.job_id });
-    } catch (err: any) {
-      setResult({ error: err.message || "Something went wrong" });
+    } catch (err) {
+        if (err instanceof Error) {
+            setResult({ error: err.message });
+         } else {
+        setResult({ error: "Something went wrong" });
+        }
     }
   }
 
