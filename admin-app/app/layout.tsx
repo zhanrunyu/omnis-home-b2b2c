@@ -3,7 +3,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Providers from './providers'
 import { Suspense } from "react";   // added
-
+import Link from 'next/link'
+import { signOut } from './actions/signOut'
 
 
 const geistSans = Geist({
@@ -28,14 +29,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Suspense fallback={null}>
-          <Providers>
-            {children}
-          </Providers>
-        </Suspense>
+      <body className="bg-background text-foreground">
+        <header className="border-b">
+          <nav className="max-w-5xl mx-auto flex items-center gap-4 p-3">
+            <Link href="/dashboard">Dashboard</Link>
+            <Link href="/catalog">Catalog</Link>
+            <Link href="/visualize">Visualize</Link>
+
+            <form action={signOut} className="ml-auto">
+              <button className="text-sm text-muted-foreground hover:underline">
+                Sign out
+              </button>
+            </form>
+          </nav>
+        </header>
+
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
