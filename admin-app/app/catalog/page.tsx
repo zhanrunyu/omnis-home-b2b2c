@@ -2,7 +2,7 @@
 import { createClient } from "@/lib/supabaseServer";
 
 export default async function CatalogPage() {
-  const supabase = createClient();
+  const supabase = await createClient();
 
   const { data: products, error } = await supabase
     .from("products")

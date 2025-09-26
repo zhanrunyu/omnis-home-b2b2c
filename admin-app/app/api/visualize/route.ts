@@ -17,7 +17,7 @@ export async function POST(req: Request) {
 
     // optional: write to visual_jobs so you can see rows appearing
     try {
-      const supabase = createClient(); // ✅ now this works
+      const supabase = await createClient();
       await supabase.from("visual_jobs").insert([
         {
           room_image_url,

@@ -9,7 +9,7 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL("/sign-in?error=missing_code", request.url));
   }
 
-  const supabase = createClient();
+  const supabase = await createClient();
   // This exchanges the code for a session and sets the auth cookies
   const { error } = await supabase.auth.exchangeCodeForSession(code);
 

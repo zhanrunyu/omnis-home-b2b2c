@@ -1,25 +1,22 @@
-// lib/supabase/server.ts
-import { cookies } from 'next/headers'
-import { createServerClient, type CookieOptions } from '@supabase/ssr'
+// lib/supabaseServer.ts
+import { cookies } from "next/headers";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 
-export function createClient() {
-  const cookieStore = cookies()
+export async function createClient() {
+  // In Next 15 this can be Promise<ReadonlyRequestCookies> in some contexts
+  const cookieStore = await cookies();
 
+  // Read-only cookies in RSC/route helpers to avoid mutation errors
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
         get(name: string) {
-          return cookieStore.get(name)?.value
+          return cookieStore.get(name)?.value;
         },
-        set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options })
-        },
-        remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: '', ...options, expires: new Date(0) })
-        },
+        // no set/remove here; mutate cookies only inside Server Actions or Route Handlers
       },
     }
-  )
+  );
 }
