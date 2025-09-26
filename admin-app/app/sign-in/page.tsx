@@ -1,5 +1,4 @@
-// app/sign-in/page.tsx
-'use client'
+"use client"
 
 import { useState } from 'react'
 import { createClient } from '@/lib/supabaseClient' // browser helper

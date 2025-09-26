@@ -1,42 +1,93 @@
-// app/visualize/page.tsx
-'use client'
+"use client";
 
-import Image from 'next/image'
-import { useState } from 'react'
-import { requireUser } from '@/lib/requireUser' // NOTE: can't call from client, see note below
+import { useState } from "react";
 
+/**
+ * Minimal client-side form that POSTs to /api/visualize
+ * and shows the returned composite_url.
+ */
 export default function VisualizePage() {
-  // This page is a quick stub for now; we’ll protect at the layout level or with dev bypass.
-  const [url, setUrl] = useState('')
-  const [result, setResult] = useState<string | null>(null)
+  const [roomUrl, setRoomUrl] = useState("");
+  const [placements, setPlacements] = useState("[]"); // JSON string
+  const [result, setResult] = useState<{ url?: string; error?: string; jobId?: string }>({});
 
-  function handleStub() {
-    // Pretend we sent a job and got a composite image back:
-    setResult('/globe.svg') // uses Next.js starter public icon as a placeholder
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setResult({});
+
+    try {
+      const parsedPlacements = placements.trim() ? JSON.parse(placements) : [];
+
+      const res = await fetch("/api/visualize", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          room_image_url: roomUrl,
+          placements: parsedPlacements,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Request failed");
+
+      setResult({ url: data.composite_url, jobId: data.job_id });
+    } catch (err: any) {
+      setResult({ error: err.message || "Something went wrong" });
+    }
   }
 
   return (
-    <div className="p-8 max-w-xl">
-      <h1 className="text-2xl font-semibold mb-4">Visualize (stub)</h1>
-      <div className="space-y-3">
-        <input
-          className="w-full border rounded px-3 py-2 bg-background"
-          placeholder="Paste room image URL"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-        />
-        <button className="px-3 py-2 rounded bg-primary text-primary-foreground" onClick={handleStub}>
-          Create composite (stub)
-        </button>
-      </div>
+    <main className="max-w-2xl mx-auto p-6 space-y-6">
+      <h1 className="text-2xl font-semibold">Visualize</h1>
 
-      {result && (
-        <div className="mt-6">
-          <p className="text-sm text-muted-foreground mb-2">Result:</p>
-          {/* Using next/image for the placeholder */}
-          <Image src={result} alt="composite" width={100} height={100} />
+      <form onSubmit={onSubmit} className="space-y-4">
+        <label className="block">
+          <div className="mb-1 font-medium">Room image URL</div>
+          <input
+            className="w-full rounded border px-3 py-2"
+            placeholder="https://res.cloudinary.com/…/room.jpg"
+            value={roomUrl}
+            onChange={(e) => setRoomUrl(e.target.value)}
+          />
+        </label>
+
+        <label className="block">
+          <div className="mb-1 font-medium">Placements (JSON array)</div>
+          <textarea
+            className="w-full rounded border px-3 py-2 font-mono text-sm"
+            rows={4}
+            placeholder='[{"sku":"SOFA-123","x":10,"y":20}]'
+            value={placements}
+            onChange={(e) => setPlacements(e.target.value)}
+          />
+        </label>
+
+        <button
+          type="submit"
+          className="rounded bg-black text-white px-4 py-2"
+        >
+          Submit
+        </button>
+      </form>
+
+      {result.error && (
+        <p className="text-red-600">Error: {result.error}</p>
+      )}
+
+      {result.url && (
+        <div className="space-y-2">
+          <div className="font-medium">Composite URL</div>
+          <a
+            href={result.url}
+            className="text-blue-600 underline break-all"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {result.url}
+          </a>
+          {result.jobId && <div className="text-sm text-gray-500">job_id: {result.jobId}</div>}
         </div>
       )}
-    </div>
-  )
+    </main>
+  );
 }
