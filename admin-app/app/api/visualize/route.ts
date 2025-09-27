@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabaseServer"; // ✅ add this line
+import { createWritableServerClient } from "@/lib/supabaseServer"; 
 
 // small helper
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
 
     // optional: write to visual_jobs so you can see rows appearing
     try {
-      const supabase = await createClient();
+      const supabase = await createWritableServerClient();
       await supabase.from("visual_jobs").insert([
         {
           room_image_url,

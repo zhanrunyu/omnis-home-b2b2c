@@ -1,8 +1,8 @@
 // app/catalog/page.tsx
-import { createClient } from "@/lib/supabaseServer";
+import { createReadonlyServerClient } from "@/lib/supabaseServer";
 
 export default async function CatalogPage() {
-  const supabase = await createClient();
+  const supabase = await createReadonlyServerClient();
 
   const { data: products, error } = await supabase
     .from("products")
