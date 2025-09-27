@@ -43,10 +43,11 @@ export default function RootLayout({
             </form>
           </nav>
         </header>
-
+        <Suspense fallback={null}>
         <Providers>
           {children}
         </Providers>
+        </Suspense>
       </body>
     </html>
   );
