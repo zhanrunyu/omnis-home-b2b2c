@@ -16,7 +16,7 @@ export default function SignInPage() {
     setError(null)
 
     const supabase = await createClient()
-    const redirectTo = `${location.origin}/auth/callback?next=/dashboard`
+//    const redirectTo = `${location.origin}/auth/callback?next=/dashboard`
 
     const { error } = await supabase.auth.signInWithOtp({
       email,
